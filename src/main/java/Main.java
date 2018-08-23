@@ -6,13 +6,22 @@ public class Main {
         String artifactId = "maven-clean-plugin";
         String version = "2.6.1";
 
-        // search group
+        // search existing group
         System.out.println("Searching group: " + groupId);
         if (LocalMavenRepositoryReader.doesGroupExist(groupId)) {
             System.out.println("\tgroup found");
         } else {
             System.out.println("\tgroup not found");
             return;
+        }
+
+        // search non-existing group
+        System.out.println("Searching group: " + groupId + ".p");
+        if (LocalMavenRepositoryReader.doesGroupExist(groupId + ".p")) {
+            System.out.println("\tgroup found");
+        } else {
+            System.out.println("\tgroup not found");
+            System.out.println("\tsub grop not found: " + LocalMavenRepositoryReader.getNonExistingSubGroup(groupId + ".p"));
         }
 
         // search artifact
@@ -25,7 +34,6 @@ public class Main {
 
         // list artifacts
         System.out.println("Artifacts of: " + groupId);
-
         for (String artifact : LocalMavenRepositoryReader.getArtifactsOfGroup(groupId)) {
             System.out.println("\t" + artifact);
         }
@@ -40,7 +48,6 @@ public class Main {
 
         // list versions
         System.out.println("Versions of: " + groupId + "." + artifactId);
-
         for (String v : LocalMavenRepositoryReader.getArtifactVersions(groupId, artifactId)) {
             System.out.println("\t" + v);
         }
