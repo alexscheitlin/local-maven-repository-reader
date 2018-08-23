@@ -7,10 +7,10 @@ public class LocalMavenRepositoryReaderTest {
     @Test
     public void doesGroupExist_shouldExist() {
         // assign variables with test data
-        String groupID = "org.apache.maven.plugins";
+        String groupId = "org.apache.maven.plugins";
 
         // execute methods to be tested
-        boolean result = LocalMavenRepositoryReader.doesGroupExist(groupID);
+        boolean result = LocalMavenRepositoryReader.doesGroupExist(groupId);
 
         // assert result
         Assert.assertTrue(result);
@@ -19,10 +19,10 @@ public class LocalMavenRepositoryReaderTest {
     @Test
     public void doesGroupExist_shouldNotExist() {
         // assign variables with test data
-        String groupID = "org.apache.maven.p";
+        String groupId = "org.apache.maven.p";
 
         // execute methods to be tested
-        boolean result = LocalMavenRepositoryReader.doesGroupExist(groupID);
+        boolean result = LocalMavenRepositoryReader.doesGroupExist(groupId);
 
         // assert result
         Assert.assertFalse(result);
@@ -31,11 +31,11 @@ public class LocalMavenRepositoryReaderTest {
     @Test
     public void getNonExistingSubGroup_shouldGetSubGroup() {
         // assign variables with test data
-        String groupID = "org.apache.maven.p";
+        String groupId = "org.apache.maven.p";
         String expectedSubGroup = "p";
 
         // execute methods to be tested
-        String actualSubGroup = LocalMavenRepositoryReader.getNonExistingSubGroup(groupID);
+        String actualSubGroup = LocalMavenRepositoryReader.getNonExistingSubGroup(groupId);
 
         // assert result
         Assert.assertEquals(expectedSubGroup, actualSubGroup);
@@ -44,13 +44,53 @@ public class LocalMavenRepositoryReaderTest {
     @Test
     public void getNonExistingSubGroup_shouldNotGetSubGroup() {
         // assign variables with test data
-        String groupID = "org.apache.maven.plugins";
+        String groupId = "org.apache.maven.plugins";
 
         // execute methods to be tested
-        String actualSubGroup = LocalMavenRepositoryReader.getNonExistingSubGroup(groupID);
+        String actualSubGroup = LocalMavenRepositoryReader.getNonExistingSubGroup(groupId);
 
         // assert result
         Assert.assertNull(actualSubGroup);
+    }
+
+    @Test
+    public void doesArtifactExist_shouldExist() {
+        // assign variables with test data
+        String groupId = "org.apache.maven.plugins";
+        String artifactId = "maven-clean-plugin";
+
+        // execute methods to be tested
+        boolean result = LocalMavenRepositoryReader.doesArtifactExist(groupId, artifactId);
+
+        // assert result
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void doesArtifactExist_shouldNotExist() {
+        // assign variables with test data
+        String groupId = "org.apache.maven.plugins";
+        String artifactId = "m";
+
+        // execute methods to be tested
+        boolean result = LocalMavenRepositoryReader.doesArtifactExist(groupId, artifactId);
+
+        // assert result
+        Assert.assertFalse(result);
+    }
+
+    @Test
+    public void getExpectedGroupPath() {
+        // assign variables with test data
+        String groupId = "org.apache.maven.plugins";
+        String expectedGroupPath = LocalMavenRepositoryReader.LOCAL_MAVEN_REPOSITORY + "\\org\\apache\\maven\\plugins";
+
+        // execute methods to be tested
+        String actualGroupPath = LocalMavenRepositoryReader.getExpectedGroupPath(groupId);
+
+        // assert result
+        Assert.assertEquals(expectedGroupPath, actualGroupPath);
+
     }
 
     @Test

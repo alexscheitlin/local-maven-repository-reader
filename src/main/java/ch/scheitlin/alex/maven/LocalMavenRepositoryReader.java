@@ -9,14 +9,14 @@ import java.util.Arrays;
  * '.m2/repository' folder within the 'user.home' directory).
  */
 public class LocalMavenRepositoryReader {
-    private static final String userHome = System.getProperty("user.home");
-    private static final String localMavenRepository = userHome + "\\.m2\\repository";
+    static final String USER_HOME = System.getProperty("user.home");
+    static final String LOCAL_MAVEN_REPOSITORY = USER_HOME + "\\.m2\\repository";
 
     /**
      * Checks whether a specific group exists in the local maven repository.
      *
      * @param groupId the id of the group as specified in the {@code <groupId></groupId>} element of the respective
-     *                pom.xml file
+     *                pom.xml file of the project
      * @return {@code true} if the specified group exists in the local maven repository, {@code false} if not
      */
     public static boolean doesGroupExist(String groupId) {
@@ -26,14 +26,14 @@ public class LocalMavenRepositoryReader {
     }
 
     /**
-     * Gets the part of the specified group id that does not exist in the local maven repository.
+     * Gets the part of a specific group id that does not exist in the local maven repository.
      *
      * @param groupId the id of the group as specified in the {@code <groupId></groupId>} element of the respective
-     *                pom.xml file
+     *                pom.xml file of the project
      * @return the part of the specified group id that does not exist or {@code null} if the group exists
      */
     public static String getNonExistingSubGroup(String groupId) {
-        String groupPath = LocalMavenRepositoryReader.localMavenRepository;
+        String groupPath = LocalMavenRepositoryReader.LOCAL_MAVEN_REPOSITORY;
         for (String subGroup : groupId.split("\\.")) {
             if (doesDirectoryContainSubDirectory(groupPath, subGroup)) {
                 groupPath += "\\" + subGroup;
@@ -43,6 +43,36 @@ public class LocalMavenRepositoryReader {
         }
 
         return null;
+    }
+
+    /**
+     * Checks whether a specific artifact of a specific group exists in the local maven repository.
+     *
+     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                   pom.xml file of the project
+     * @param artifactId the id of the artifact as specified in the {@code <artifactId></artifactId>} element of the
+     *                   respective pom.xml file of the project
+     * @return {@code true} if the specified artifact of the specified group exists in the local maven repository,
+     * {@code false} if not
+     */
+    public static boolean doesArtifactExist(String groupId, String artifactId) {
+        if (!doesGroupExist(groupId)) {
+            return false;
+        }
+
+        return doesDirectoryContainSubDirectory(getExpectedGroupPath(groupId), artifactId);
+    }
+
+    /**
+     * Gets the corresponding path of the specific group id in the local maven repository. This does not mean that the
+     * directory exists. The group id just gets converted to the expected path of this group.
+     *
+     * @param groupId the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                pom.xml file of the project
+     * @return the expected path to the specified group
+     */
+    static String getExpectedGroupPath(String groupId) {
+        return LocalMavenRepositoryReader.LOCAL_MAVEN_REPOSITORY + "\\" + groupId.replaceAll("\\.", "\\\\");
     }
 
     /**
