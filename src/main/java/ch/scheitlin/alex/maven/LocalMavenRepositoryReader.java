@@ -5,8 +5,15 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 
 /**
- * Provides functions to access check whether groups exists in the local maven repository (located at the
- * '.m2/repository' folder within the 'user.home' directory).
+ * <p>Provides functions to access data from the local maven repository located at the '.m2/repository' folder within the 'user.home' directory.</p>
+ * <p>The following is possible:</p>
+ * <ul>
+ * <li>check whether a specific group exists or not</li>
+ * <li>get the part of a specific groupId that does not exist</li>
+ * <li>check whether a specific artifact (of a group) exists or not</li>
+ * <li>check whether a specific version (of a artifact of a group) exists or not</li>
+ * <li></li>
+ * </ul>
  */
 public class LocalMavenRepositoryReader {
     static final String USER_HOME = System.getProperty("user.home");
@@ -81,6 +88,25 @@ public class LocalMavenRepositoryReader {
         }
 
         return doesDirectoryContainSubDirectory(getExpectedArtifactPath(groupId, artifactId), version);
+    }
+
+    /**
+     * Gets a list of all in the local maven repository existing versions of a specific artifact of a specific group.
+     *
+     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                   pom.xml file of the project
+     * @param artifactId the id of the artifact as specified in the {@code <artifactId></artifactId>} element of the
+     *                   respective pom.xml file of the project
+     * @return {@code String Array} with all versions of the specified artifact of the specified group or an empty
+     * {@code String Array} if no versions are available
+     */
+    public static String[] getArtifactVersions(String groupId, String artifactId) {
+        if (!doesArtifactExist(groupId, artifactId)) {
+            return new String[]{};
+        }
+
+        String[] versions = getDirectories(getExpectedArtifactPath(groupId, artifactId));
+        return versions == null ? new String[]{} : versions;
     }
 
 

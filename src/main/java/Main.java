@@ -30,5 +30,12 @@ public class Main {
         } else {
             System.out.println("\tversion not found");
         }
+
+        // list versions
+        System.out.println("Versions of: " + groupId + "." + artifactId);
+
+        for (String v : LocalMavenRepositoryReader.getArtifactVersions(groupId, artifactId)) {
+            System.out.println("\t" + v);
+        }
     }
 }
