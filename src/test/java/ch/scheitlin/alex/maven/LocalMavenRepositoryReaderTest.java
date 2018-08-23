@@ -29,6 +29,31 @@ public class LocalMavenRepositoryReaderTest {
     }
 
     @Test
+    public void getNonExistingSubGroup_shouldGetSubGroup() {
+        // assign variables with test data
+        String groupID = "org.apache.maven.p";
+        String expectedSubGroup = "p";
+
+        // execute methods to be tested
+        String actualSubGroup = LocalMavenRepositoryReader.getNonExistingSubGroup(groupID);
+
+        // assert result
+        Assert.assertEquals(expectedSubGroup, actualSubGroup);
+    }
+
+    @Test
+    public void getNonExistingSubGroup_shouldNotGetSubGroup() {
+        // assign variables with test data
+        String groupID = "org.apache.maven.plugins";
+
+        // execute methods to be tested
+        String actualSubGroup = LocalMavenRepositoryReader.getNonExistingSubGroup(groupID);
+
+        // assert result
+        Assert.assertNull(actualSubGroup);
+    }
+
+    @Test
     public void doesArrayContain_shouldContain() {
         // assign variables with test data
         String[] array = {"value1", "value2", "value3"};

@@ -4,29 +4,45 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 
+/**
+ * Provides functions to access check whether groups exists in the local maven repository (located at the
+ * '.m2/repository' folder within the 'user.home' directory).
+ */
 public class LocalMavenRepositoryReader {
     private static final String userHome = System.getProperty("user.home");
     private static final String localMavenRepository = userHome + "\\.m2\\repository";
 
     /**
-     * Checks whether a specific group exists in the local maven repository (located at the '.m2/repository' folder
-     * within the 'user.home' directory).
+     * Checks whether a specific group exists in the local maven repository.
      *
      * @param groupId the id of the group as specified in the {@code <groupId></groupId>} element of the respective
      *                pom.xml file
      * @return {@code true} if the specified group exists in the local maven repository, {@code false} if not
      */
     public static boolean doesGroupExist(String groupId) {
+        String nonExistingSubGroup = getNonExistingSubGroup(groupId);
+
+        return nonExistingSubGroup == null;
+    }
+
+    /**
+     * Gets the part of the specified group id that does not exist in the local maven repository.
+     *
+     * @param groupId the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                pom.xml file
+     * @return the part of the specified group id that does not exist or {@code null} if the group exists
+     */
+    public static String getNonExistingSubGroup(String groupId) {
         String groupPath = LocalMavenRepositoryReader.localMavenRepository;
         for (String subGroup : groupId.split("\\.")) {
             if (doesDirectoryContainSubDirectory(groupPath, subGroup)) {
                 groupPath += "\\" + subGroup;
             } else {
-                return false;
+                return subGroup;
             }
         }
 
-        return true;
+        return null;
     }
 
     /**
