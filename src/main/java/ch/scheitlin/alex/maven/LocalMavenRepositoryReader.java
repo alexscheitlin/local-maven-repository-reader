@@ -64,8 +64,29 @@ public class LocalMavenRepositoryReader {
     }
 
     /**
-     * Gets the corresponding path of the specific group id in the local maven repository. This does not mean that the
-     * directory exists. The group id just gets converted to the expected path of this group.
+     * Checks whether a specific version of specific artifact of a specific group exists in the local maven repository.
+     *
+     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                   pom.xml file of the project
+     * @param artifactId the id of the artifact as specified in the {@code <artifactId></artifactId>} element of the
+     *                   respective pom.xml file of the project
+     * @param version    the version of the artifact as specified in the {@code <version></version>} element of the
+     *                   respective pom.xml file of the project
+     * @return {@code true} if the specified version of the specified artifact of the specified group exists in the
+     * local maven repository, {@code false} if not
+     */
+    public static boolean doesVersionExist(String groupId, String artifactId, String version) {
+        if (!doesArtifactExist(groupId, artifactId)) {
+            return false;
+        }
+
+        return doesDirectoryContainSubDirectory(getExpectedArtifactPath(groupId, artifactId), version);
+    }
+
+
+    /**
+     * Gets the expected path of a specific group in the local maven repository. This does not mean that the directory
+     * exists. The group id just gets converted to the expected path of this group.
      *
      * @param groupId the id of the group as specified in the {@code <groupId></groupId>} element of the respective
      *                pom.xml file of the project
@@ -73,6 +94,20 @@ public class LocalMavenRepositoryReader {
      */
     static String getExpectedGroupPath(String groupId) {
         return LocalMavenRepositoryReader.LOCAL_MAVEN_REPOSITORY + "\\" + groupId.replaceAll("\\.", "\\\\");
+    }
+
+    /**
+     * Gets the expected path of a specific artifact in the local maven repository. This does not mean that the
+     * directory exists. The artifact id just gets converted to the expected path of this artifact.
+     *
+     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                   pom.xml file of the project
+     * @param artifactId the id of the artifact as specified in the {@code <artifactId></artifactId>} element of the
+     *                   respective pom.xml file of the project
+     * @return the expected path to the specified artifact
+     */
+    static String getExpectedArtifactPath(String groupId, String artifactId) {
+        return getExpectedGroupPath(groupId) + "\\" + artifactId;
     }
 
     /**

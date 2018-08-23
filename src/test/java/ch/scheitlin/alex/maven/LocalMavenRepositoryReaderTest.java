@@ -80,6 +80,34 @@ public class LocalMavenRepositoryReaderTest {
     }
 
     @Test
+    public void doesVersionExist_shouldExist() {
+        // assign variables with test data
+        String groupId = "org.apache.maven.plugins";
+        String artifactId = "maven-clean-plugin";
+        String version = "2.6.1";
+
+        // execute methods to be tested
+        boolean result = LocalMavenRepositoryReader.doesVersionExist(groupId, artifactId, version);
+
+        // assert result
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void doesVersionExist_shouldNotExist() {
+        // assign variables with test data
+        String groupId = "org.apache.maven.plugins";
+        String artifactId = "m";
+        String version = "-1";
+
+        // execute methods to be tested
+        boolean result = LocalMavenRepositoryReader.doesVersionExist(groupId, artifactId, version);
+
+        // assert result
+        Assert.assertFalse(result);
+    }
+
+    @Test
     public void getExpectedGroupPath() {
         // assign variables with test data
         String groupId = "org.apache.maven.plugins";
@@ -91,6 +119,20 @@ public class LocalMavenRepositoryReaderTest {
         // assert result
         Assert.assertEquals(expectedGroupPath, actualGroupPath);
 
+    }
+
+    @Test
+    public void getExpectedArtifactPath() {
+        // assign variables with test data
+        String groupId = "org.apache.maven.plugins";
+        String artifactId = "maven-clean-plugin";
+        String expectedArtifactPath = LocalMavenRepositoryReader.LOCAL_MAVEN_REPOSITORY + "\\org\\apache\\maven\\plugins\\maven-clean-plugin";
+
+        // execute methods to be tested
+        String actualArtifactPath = LocalMavenRepositoryReader.getExpectedArtifactPath(groupId, artifactId);
+
+        // assert result
+        Assert.assertEquals(expectedArtifactPath, actualArtifactPath);
     }
 
     @Test
