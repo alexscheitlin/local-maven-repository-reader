@@ -2,6 +2,7 @@
 
 > _Provides functions to get information about locally available maven artifacts and their versions from the .m2 directory._
 
+[![Build Status](https://travis-ci.org/alexscheitlin/local-maven-repository-reader?branch=master)](https://travis-ci.org/alexscheitlin/local-maven-repository-reader)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## How to Use
