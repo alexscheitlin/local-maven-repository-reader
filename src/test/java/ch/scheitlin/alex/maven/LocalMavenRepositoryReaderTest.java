@@ -4,6 +4,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class LocalMavenRepositoryReaderTest {
+    /*
+    // This tests won't succeed in every environment because either different artifacts and versions are available or
+    // the .m2 directory is not located at the same path.
     @Test
     public void doesGroupExist_shouldExist() {
         // assign variables with test data
@@ -79,8 +82,6 @@ public class LocalMavenRepositoryReaderTest {
         Assert.assertFalse(result);
     }
 
-    /*
-    // This test won't succeed in every environment because of the different versions available.
     @Test
     public void doesVersionExist_shouldExist() {
         // assign variables with test data
@@ -94,7 +95,6 @@ public class LocalMavenRepositoryReaderTest {
         // assert result
         Assert.assertTrue(result);
     }
-    */
 
     @Test
     public void doesVersionExist_shouldNotExist() {
@@ -109,6 +109,7 @@ public class LocalMavenRepositoryReaderTest {
         // assert result
         Assert.assertFalse(result);
     }
+    */
 
     @Test
     public void getExpectedGroupPath() {
