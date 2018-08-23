@@ -11,8 +11,9 @@ import java.util.Arrays;
  * <li>check whether a specific group exists or not</li>
  * <li>get the part of a specific groupId that does not exist</li>
  * <li>check whether a specific artifact (of a group) exists or not</li>
+ * <li>get a list of all available artifacts of a specific group</li>
  * <li>check whether a specific version (of a artifact of a group) exists or not</li>
- * <li></li>
+ * <li>get a list of all available versions of a specific artifact</li>
  * </ul>
  */
 public class LocalMavenRepositoryReader {
@@ -68,6 +69,23 @@ public class LocalMavenRepositoryReader {
         }
 
         return doesDirectoryContainSubDirectory(getExpectedGroupPath(groupId), artifactId);
+    }
+
+    /**
+     * Gets a list of all in the local maven repository existing artifacts of a specific group.
+     *
+     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                   pom.xml file of the project
+     * @return {@code String Array} with all artifacts of the specified group or an empty {@code String Array} if no
+     * artifacts are available
+     */
+    public static String[] getArtifactsOfGroup(String groupId) {
+        if (!doesGroupExist(groupId)) {
+            return new String[]{};
+        }
+
+        String[] versions = getDirectories(getExpectedGroupPath(groupId));
+        return versions == null ? new String[]{} : versions;
     }
 
     /**

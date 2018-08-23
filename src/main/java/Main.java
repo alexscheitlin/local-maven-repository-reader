@@ -23,8 +23,15 @@ public class Main {
             System.out.println("\tartifact not found");
         }
 
+        // list artifacts
+        System.out.println("Artifacts of: " + groupId);
+
+        for (String artifact : LocalMavenRepositoryReader.getArtifactsOfGroup(groupId)) {
+            System.out.println("\t" + artifact);
+        }
+
         // search version
-        System.out.println("Searching artifact: " + artifactId);
+        System.out.println("Searching version: " + version);
         if (LocalMavenRepositoryReader.doesVersionExist(groupId, artifactId, version)) {
             System.out.println("\tversion found");
         } else {
