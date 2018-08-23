@@ -2,10 +2,51 @@
 
 > _Provides functions to get information about locally available maven artifacts and their versions from the .m2 directory._
 
-[![Build Status](https://travis-ci.org/alexscheitlin/local-maven-repository-reader?branch=master)](https://travis-ci.org/alexscheitlin/local-maven-repository-reader)
+[![Build Status](https://travis-ci.org/alexscheitlin/local-maven-repository-reader.svg?branch=master)](https://travis-ci.org/alexscheitlin/local-maven-repository-reader)
+[![JitPack Version](https://jitpack.io/v/alexscheitlin/local-maven-repository-reader.svg)](https://jitpack.io/#alexscheitlin/local-maven-repository-reader/v1.0.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## How to Use
+
+### Add Dependency
+
+#### Maven
+
+- Add the JitPack repository to your `pom.xml` file:
+```
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+```
+
+- Add the dependency:
+```
+	<dependency>
+	    <groupId>com.github.alexscheitlin</groupId>
+	    <artifactId>local-maven-repository-reader</artifactId>
+	    <version>v1.0.0</version>
+	</dependency>
+```
+
+#### Gradle
+
+- Add the JitPack repository to your `build.gradle` file:
+```
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+```
+
+- Add the dependency:
+```
+	dependencies {
+	        implementation 'com.github.alexscheitlin:local-maven-repository-reader:v1.0.0'
+	}
+```
 
 ### Code Example
 
