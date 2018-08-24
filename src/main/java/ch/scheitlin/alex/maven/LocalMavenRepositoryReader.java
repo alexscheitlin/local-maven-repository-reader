@@ -2,7 +2,9 @@ package ch.scheitlin.alex.maven;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>Provides functions to access data from the local maven repository located at the '.m2/repository' folder within the 'user.home' directory.</p>
@@ -28,9 +30,13 @@ public class LocalMavenRepositoryReader {
      * @return {@code true} if the specified group exists in the local maven repository, {@code false} if not
      */
     public static boolean doesGroupExist(String groupId) {
-        String nonExistingSubGroup = getNonExistingSubGroup(groupId);
+        // check whether the folder for the group exists
+        if (!doesGroupFolderExist(groupId)) {
+            return false;
+        }
 
-        return nonExistingSubGroup == null;
+        // check whether an artifact exists
+        return getArtifactsOfGroup(groupId).length != 0;
     }
 
     /**
@@ -64,32 +70,48 @@ public class LocalMavenRepositoryReader {
      * {@code false} if not
      */
     public static boolean doesArtifactExist(String groupId, String artifactId) {
-        if (!doesGroupExist(groupId)) {
+        // check whether the folder for the artifact exists
+        if (!doesArtifactFolderExist(groupId, artifactId)) {
             return false;
         }
 
-        return doesDirectoryContainSubDirectory(getExpectedGroupPath(groupId), artifactId);
+        // check whether a version exists
+        return getArtifactVersions(groupId, artifactId).length != 0;
     }
 
     /**
      * Gets a list of all in the local maven repository existing artifacts of a specific group.
      *
-     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
-     *                   pom.xml file of the project
+     * @param groupId the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                pom.xml file of the project
      * @return {@code String Array} with all artifacts of the specified group or an empty {@code String Array} if no
      * artifacts are available
      */
     public static String[] getArtifactsOfGroup(String groupId) {
-        if (!doesGroupExist(groupId)) {
-            return new String[]{};
+        String[] expectedArtifacts = getDirectories(getExpectedGroupPath(groupId));
+        List<String> artifacts = new ArrayList<String>();
+        for (String expectedArtifact : expectedArtifacts) {
+            if (doesArtifactExist(groupId, expectedArtifact)) {
+                artifacts.add(expectedArtifact);
+            }
         }
-
-        String[] versions = getDirectories(getExpectedGroupPath(groupId));
-        return versions == null ? new String[]{} : versions;
+        return artifacts.size() == 0 ? new String[]{} : artifacts.toArray(new String[0]);
     }
 
     /**
-     * Checks whether a specific version of specific artifact of a specific group exists in the local maven repository.
+     * <p>
+     * Checks whether a specific version of specific artifact of a specific group exists in the local maven
+     * repository.
+     * </p>
+     * <p>
+     * This function not only checks whether there exists a folder for the version but also checks whether there are
+     * only files with the ending '.lastUpdated'. If so the version is not considered as existing in the local maven
+     * repository.
+     * </p>
+     * <p>
+     * The version is only considered existing in the local maven repository if for every file with the ending
+     * '.lastUpdated' there is a file with the same name (considered as source file, e.g. jar or pom).
+     * </p>
      *
      * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
      *                   pom.xml file of the project
@@ -101,11 +123,57 @@ public class LocalMavenRepositoryReader {
      * local maven repository, {@code false} if not
      */
     public static boolean doesVersionExist(String groupId, String artifactId, String version) {
-        if (!doesArtifactExist(groupId, artifactId)) {
+        // check whether the folder for the version exists
+        if (!doesVersionFolderExist(groupId, artifactId, version)) {
             return false;
         }
 
-        return doesDirectoryContainSubDirectory(getExpectedArtifactPath(groupId, artifactId), version);
+        // -> folder exists
+
+        // check whether there are some files in the version folder
+        String versionPath = getExpectedVersionPath(groupId, artifactId, version);
+        String[] files = getFiles(versionPath);
+        if (files.length == 0) {
+            return false;
+        }
+
+        // -> folder exists and has at least one file
+
+        // check whether '.lastUpdated' files are available
+        String fileEnding = ".lastUpdated";
+        String[] lastUpdatedFiles = getStringsWithEnding(files, fileEnding);
+
+        if (lastUpdatedFiles.length == 0) {
+            return true;
+        }
+
+        // -> folder exists and has at least one file with ending '.lastUpdated'
+
+        // check whether all files are '.lastUpdated' files
+        if (files.length == lastUpdatedFiles.length) {
+            return false;
+        }
+
+        // -> folder exists and has at least one file with ending '.lastUpdated' and at least on file with a different
+        //    ending
+
+        // check whether for each '.lastUpdated' file there is also a corresponding source file
+        String[] notLastUpdatedFiles = getStringsWithDifferentEnding(files, fileEnding);
+        for (String lastUpdatedFile : lastUpdatedFiles) {
+            boolean foundSourceFile = false;
+            for (String notLastUpdatedFile : notLastUpdatedFiles) {
+                if (notLastUpdatedFile.equals(lastUpdatedFile.replaceAll("\\.lastUpdated", ""))) {
+                    foundSourceFile = true;
+                    break;
+                }
+            }
+
+            if (!foundSourceFile) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -119,14 +187,64 @@ public class LocalMavenRepositoryReader {
      * {@code String Array} if no versions are available
      */
     public static String[] getArtifactVersions(String groupId, String artifactId) {
-        if (!doesArtifactExist(groupId, artifactId)) {
-            return new String[]{};
+        String[] expectedVersions = getDirectories(getExpectedArtifactPath(groupId, artifactId));
+        List<String> versions = new ArrayList<String>();
+        for (String expectedVersion : expectedVersions) {
+            if (doesVersionExist(groupId, artifactId, expectedVersion)) {
+                versions.add(expectedVersion);
+            }
         }
-
-        String[] versions = getDirectories(getExpectedArtifactPath(groupId, artifactId));
-        return versions == null ? new String[]{} : versions;
+        return versions.size() == 0 ? new String[]{} : versions.toArray(new String[0]);
     }
 
+    /**
+     * Checks whether the folder of a specific group exists.
+     *
+     * @param groupId the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                pom.xml file of the project
+     * @return {@code true} if the folder exists, {@code false} if not
+     */
+    static boolean doesGroupFolderExist(String groupId) {
+        String nonExistingSubGroup = getNonExistingSubGroup(groupId);
+
+        return nonExistingSubGroup == null;
+    }
+
+    /**
+     * Checks whether the folder of a specific artifact exists.
+     *
+     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                   pom.xml file of the project
+     * @param artifactId the id of the artifact as specified in the {@code <artifactId></artifactId>} element of the
+     *                   respective pom.xml file of the project
+     * @return {@code true} if the folder exists, {@code false} if not
+     */
+    static boolean doesArtifactFolderExist(String groupId, String artifactId) {
+        if (!doesGroupFolderExist(groupId)) {
+            return false;
+        }
+
+        return doesDirectoryContainSubDirectory(getExpectedGroupPath(groupId), artifactId);
+    }
+
+    /**
+     * Checks whether the folder of a specific version of a specific artifact exists.
+     *
+     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                   pom.xml file of the project
+     * @param artifactId the id of the artifact as specified in the {@code <artifactId></artifactId>} element of the
+     *                   respective pom.xml file of the project
+     * @param version    the version of the artifact as specified in the {@code <version></version>} element of the
+     *                   respective pom.xml file of the project
+     * @return {@code true} if the folder exists, {@code false} if not
+     */
+    static boolean doesVersionFolderExist(String groupId, String artifactId, String version) {
+        if (!doesArtifactFolderExist(groupId, artifactId)) {
+            return false;
+        }
+
+        return doesDirectoryContainSubDirectory(getExpectedArtifactPath(groupId, artifactId), version);
+    }
 
     /**
      * Gets the expected path of a specific group in the local maven repository. This does not mean that the directory
@@ -155,6 +273,22 @@ public class LocalMavenRepositoryReader {
     }
 
     /**
+     * Gets the expected path of a specific version of a specific artifact in the local maven repository. This does not
+     * mean that the directory exists. The version just gets converted to the expected path of this version.
+     *
+     * @param groupId    the id of the group as specified in the {@code <groupId></groupId>} element of the respective
+     *                   pom.xml file of the project
+     * @param artifactId the id of the artifact as specified in the {@code <artifactId></artifactId>} element of the
+     *                   respective pom.xml file of the project
+     * @param version    the version of the artifact as specified in the {@code <version></version>} element of the
+     *                   respective pom.xml file of the project
+     * @return the expected path to the specified version of the specified artifact
+     */
+    static String getExpectedVersionPath(String groupId, String artifactId, String version) {
+        return getExpectedArtifactPath(groupId, artifactId) + "\\" + version;
+    }
+
+    /**
      * Checks whether a directory contains a specific sub directory.
      *
      * @param pathToDirectory the path to the directory to search for a specific sub directory
@@ -166,7 +300,7 @@ public class LocalMavenRepositoryReader {
     }
 
     /**
-     * Gets all directories located at a specified path.
+     * Gets all directories located at a specific path.
      *
      * @param path the path to get all directories from
      * @return a {@code String Array} with all directories located at the specified path
@@ -179,6 +313,60 @@ public class LocalMavenRepositoryReader {
                     }
                 }
         );
+    }
+
+    /**
+     * Gets all files located at a specific path.
+     *
+     * @param path the path to get all files from
+     * @return a {@code String Array} with all files located at the specified path
+     */
+    private static String[] getFiles(String path) {
+        return new File(path).list(
+                new FilenameFilter() {
+                    public boolean accept(File current, String name) {
+                        return new File(current, name).isFile();
+                    }
+                }
+        );
+    }
+
+    /**
+     * Gets all {@code String}s of a {@code String Array} having a specific ending.
+     *
+     * @param strings the {@code String}s to search through
+     * @param ending  the ending a {@code String} needs to have
+     * @return {@code String Array} with all {@code String}s having the specified ending or an empty
+     * {@code String Array} if no {@code String} has the specified ending
+     */
+    static String[] getStringsWithEnding(String[] strings, String ending) {
+        List<String> stringsWithEnding = new ArrayList<String>();
+        for (String string : strings) {
+            if (string.endsWith(ending)) {
+                stringsWithEnding.add(string);
+            }
+        }
+
+        return stringsWithEnding.toArray(new String[0]);
+    }
+
+    /**
+     * Gets all {@code String}s of a {@code String Array} having not a specific ending.
+     *
+     * @param strings the {@code String}s to search through
+     * @param ending  the ending a {@code String} does not need to have
+     * @return {@code String Array} with all {@code String}s not having the specified ending or an empty
+     * {@code String Array} if all {@code String}s have the specified ending
+     */
+    static String[] getStringsWithDifferentEnding(String[] strings, String ending) {
+        List<String> stringsWithDifferentEnding = new ArrayList<String>();
+        for (String string : strings) {
+            if (!string.endsWith(ending)) {
+                stringsWithDifferentEnding.add(string);
+            }
+        }
+
+        return stringsWithDifferentEnding.toArray(new String[0]);
     }
 
     /**

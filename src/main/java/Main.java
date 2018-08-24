@@ -12,7 +12,6 @@ public class Main {
             System.out.println("\tgroup found");
         } else {
             System.out.println("\tgroup not found");
-            return;
         }
 
         // search non-existing group

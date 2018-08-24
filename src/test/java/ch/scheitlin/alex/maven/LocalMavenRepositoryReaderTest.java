@@ -140,6 +140,83 @@ public class LocalMavenRepositoryReaderTest {
     }
 
     @Test
+    public void getExpectedVersionPath() {
+        // assign variables with test data
+        String groupId = "org.apache.maven.plugins";
+        String artifactId = "maven-clean-plugin";
+        String version = "2.6.1";
+        String expectedVersionPath = LocalMavenRepositoryReader.LOCAL_MAVEN_REPOSITORY + "\\org\\apache\\maven\\plugins\\maven-clean-plugin\\2.6.1";
+
+        // execute methods to be tested
+        String actualVersionPath = LocalMavenRepositoryReader.getExpectedVersionPath(groupId, artifactId, version);
+
+        // assert result
+        Assert.assertEquals(expectedVersionPath, actualVersionPath);
+    }
+
+    @Test
+    public void getStringsWithEnding_containsOne() {
+        // assign variables with test data
+        String[] strings = {"file.a", "file.b", "file.c"};
+        String ending = "a";
+        String[] expectedStrings = { "file.a" };    // in same order as they occur
+
+        // execute methods to be tested
+        String[] actualStrings = LocalMavenRepositoryReader.getStringsWithEnding(strings, ending);
+
+        // assert result
+        Assert.assertEquals(expectedStrings.length, actualStrings.length);
+        for (int i = 0 ; i < expectedStrings.length; i++) {
+            Assert.assertEquals(expectedStrings[i], actualStrings[i]);
+        }
+    }
+
+    @Test
+    public void getStringsWithEnding_containsNone() {
+        // assign variables with test data
+        String[] strings = {"file.a", "file.b", "file.c"};
+        String ending = "d";
+        String[] expectedStrings = {};
+
+        // execute methods to be tested
+        String[] actualStrings = LocalMavenRepositoryReader.getStringsWithEnding(strings, ending);
+
+        // assert result
+        Assert.assertEquals(expectedStrings.length, actualStrings.length);
+    }
+
+    @Test
+    public void getStringsWithDifferentEnding_containsOne() {
+        // assign variables with test data
+        String[] strings = {"file.a", "file.a", "file.b"};
+        String ending = "a";
+        String[] expectedStrings = { "file.b" };    // in same order as they occur
+
+        // execute methods to be tested
+        String[] actualStrings = LocalMavenRepositoryReader.getStringsWithDifferentEnding(strings, ending);
+
+        // assert result
+        Assert.assertEquals(expectedStrings.length, actualStrings.length);
+        for (int i = 0 ; i < expectedStrings.length; i++) {
+            Assert.assertEquals(expectedStrings[i], actualStrings[i]);
+        }
+    }
+
+    @Test
+    public void getStringsWithDifferentEnding_containsNone() {
+        // assign variables with test data
+        String[] strings = {"file.a", "file.a", "file.a"};
+        String ending = "a";
+        String[] expectedStrings = {};
+
+        // execute methods to be tested
+        String[] actualStrings = LocalMavenRepositoryReader.getStringsWithDifferentEnding(strings, ending);
+
+        // assert result
+        Assert.assertEquals(expectedStrings.length, actualStrings.length);
+    }
+
+    @Test
     public void doesArrayContain_shouldContain() {
         // assign variables with test data
         String[] array = {"value1", "value2", "value3"};
