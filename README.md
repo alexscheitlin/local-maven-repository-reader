@@ -52,6 +52,13 @@
 
 _The example below can be found [here](src/main/java/Main.java)._
 
+[Check whether a specific group exists or not](#check-whether-a-specific-group-exists-or-not)\
+[Get the part of a specific groupId that does not exist](#get-the-part-of-a-specific-groupid-that-does-not-exist)\
+[Check whether a specific artifact (of a group) exists or not](#check-whether-a-specific-artifact-of-a-group-exists-or-not)\
+[Get a list of all available artifacts of a specific group](#get-a-list-of-all-available-artifacts-of-a-specific-group)\
+[Check whether a specific version (of a artifact of a group) exists or not](#check-whether-a-specific-version-of-a-artifact-of-a-group-exists-or-not)\
+[Get a list of all available versions of a specific artifact](#get-a-list-of-all-available-versions-of-a-specific-artifact)
+
 #### Check whether a specific group exists or not
 
 ```java
