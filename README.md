@@ -3,7 +3,7 @@
 > _Provides functions to get information about locally available maven artifacts and their versions from the .m2 directory._
 
 [![Build Status](https://travis-ci.org/alexscheitlin/local-maven-repository-reader.svg?branch=master)](https://travis-ci.org/alexscheitlin/local-maven-repository-reader)
-[![JitPack Version](https://jitpack.io/v/alexscheitlin/local-maven-repository-reader.svg)](https://jitpack.io/#alexscheitlin/local-maven-repository-reader/v1.0.0)
+[![JitPack Version](https://jitpack.io/v/alexscheitlin/local-maven-repository-reader.svg)](https://jitpack.io/#alexscheitlin/local-maven-repository-reader/v1.1.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## How to Use
@@ -27,7 +27,7 @@
 	<dependency>
 	    <groupId>com.github.alexscheitlin</groupId>
 	    <artifactId>local-maven-repository-reader</artifactId>
-	    <version>v1.0.0</version>
+	    <version>v1.1.0</version>
 	</dependency>
 ```
 
@@ -44,7 +44,7 @@
 - Add the dependency:
 ```
 	dependencies {
-	        implementation 'com.github.alexscheitlin:local-maven-repository-reader:v1.0.0'
+	        implementation 'com.github.alexscheitlin:local-maven-repository-reader:v1.1.0'
 	}
 ```
 
